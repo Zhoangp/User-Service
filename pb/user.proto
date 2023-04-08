@@ -1,0 +1,51 @@
+syntax = "proto3";
+package user;
+option go_package = "./pb";
+service UserService {
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+  rpc GetTokenResetPass(GetTokenResetPassRequest) returns (GetTokenResetPassResponse);
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
+
+
+}
+message UpdateUserRequest {
+  uint32 id = 1;
+  string firstName = 2;
+  string lastName = 3;
+  string email = 4;
+  string password = 5;
+  string phoneNumber = 6;
+  string address = 7;
+  string role = 8;
+  bool is_instructor = 9;
+  Picture avt = 10;
+
+}
+message Picture {
+  uint32 id = 1;
+  string url = 2;
+  string width = 3;
+  string height = 4;
+}
+message UpdateUserResponse {
+  ErrorResponse error = 1;
+}
+message ErrorResponse {
+  int64 code = 1;
+  string message = 2;
+}
+message  GetTokenResetPassRequest {
+  string email = 1;
+}
+message GetTokenResetPassResponse {
+  ErrorResponse error = 1;
+}
+message ChangePasswordRequest {
+  string password = 1;
+  string new_password = 2;
+  string email = 3;
+}
+message ChangePasswordResponse {
+    ErrorResponse error = 1;
+}
+
