@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.12
-// source: pb/user.proto
+// source: pb/user-service.proto
 
 package pb
 
@@ -37,7 +37,7 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 
 func (c *userServiceClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error) {
 	out := new(UpdateUserResponse)
-	err := c.cc.Invoke(ctx, "/user.UserService/UpdateUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user-service.UserService/UpdateUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (c *userServiceClient) UpdateUser(ctx context.Context, in *UpdateUserReques
 
 func (c *userServiceClient) GetTokenResetPass(ctx context.Context, in *GetTokenResetPassRequest, opts ...grpc.CallOption) (*GetTokenResetPassResponse, error) {
 	out := new(GetTokenResetPassResponse)
-	err := c.cc.Invoke(ctx, "/user.UserService/GetTokenResetPass", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user-service.UserService/GetTokenResetPass", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (c *userServiceClient) GetTokenResetPass(ctx context.Context, in *GetTokenR
 
 func (c *userServiceClient) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error) {
 	out := new(ChangePasswordResponse)
-	err := c.cc.Invoke(ctx, "/user.UserService/ChangePassword", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user-service.UserService/ChangePassword", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func _UserService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/user.UserService/UpdateUser",
+		FullMethod: "/user-service.UserService/UpdateUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).UpdateUser(ctx, req.(*UpdateUserRequest))
@@ -126,7 +126,7 @@ func _UserService_GetTokenResetPass_Handler(srv interface{}, ctx context.Context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/user.UserService/GetTokenResetPass",
+		FullMethod: "/user-service.UserService/GetTokenResetPass",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).GetTokenResetPass(ctx, req.(*GetTokenResetPassRequest))
@@ -144,7 +144,7 @@ func _UserService_ChangePassword_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/user.UserService/ChangePassword",
+		FullMethod: "/user-service.UserService/ChangePassword",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).ChangePassword(ctx, req.(*ChangePasswordRequest))
@@ -156,7 +156,7 @@ func _UserService_ChangePassword_Handler(srv interface{}, ctx context.Context, d
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var UserService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "user.UserService",
+	ServiceName: "user-service.UserService",
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -173,5 +173,5 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "pb/user.proto",
+	Metadata: "pb/user-service.proto",
 }

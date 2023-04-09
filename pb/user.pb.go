@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.28.1
 // 	protoc        v3.21.12
-// source: pb/user.proto
+// source: pb/user-service.proto
 
 package pb
 
@@ -604,26 +604,26 @@ func file_pb_user_proto_rawDescGZIP() []byte {
 
 var file_pb_user_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_pb_user_proto_goTypes = []interface{}{
-	(*UpdateUserRequest)(nil),         // 0: user.UpdateUserRequest
-	(*Picture)(nil),                   // 1: user.Picture
-	(*UpdateUserResponse)(nil),        // 2: user.UpdateUserResponse
-	(*ErrorResponse)(nil),             // 3: user.ErrorResponse
-	(*GetTokenResetPassRequest)(nil),  // 4: user.GetTokenResetPassRequest
-	(*GetTokenResetPassResponse)(nil), // 5: user.GetTokenResetPassResponse
-	(*ChangePasswordRequest)(nil),     // 6: user.ChangePasswordRequest
-	(*ChangePasswordResponse)(nil),    // 7: user.ChangePasswordResponse
+	(*UpdateUserRequest)(nil),         // 0: user-service.UpdateUserRequest
+	(*Picture)(nil),                   // 1: user-service.Picture
+	(*UpdateUserResponse)(nil),        // 2: user-service.UpdateUserResponse
+	(*ErrorResponse)(nil),             // 3: user-service.ErrorResponse
+	(*GetTokenResetPassRequest)(nil),  // 4: user-service.GetTokenResetPassRequest
+	(*GetTokenResetPassResponse)(nil), // 5: user-service.GetTokenResetPassResponse
+	(*ChangePasswordRequest)(nil),     // 6: user-service.ChangePasswordRequest
+	(*ChangePasswordResponse)(nil),    // 7: user-service.ChangePasswordResponse
 }
 var file_pb_user_proto_depIdxs = []int32{
-	1, // 0: user.UpdateUserRequest.avt:type_name -> user.Picture
-	3, // 1: user.UpdateUserResponse.error:type_name -> user.ErrorResponse
-	3, // 2: user.GetTokenResetPassResponse.error:type_name -> user.ErrorResponse
-	3, // 3: user.ChangePasswordResponse.error:type_name -> user.ErrorResponse
-	0, // 4: user.UserService.UpdateUser:input_type -> user.UpdateUserRequest
-	4, // 5: user.UserService.GetTokenResetPass:input_type -> user.GetTokenResetPassRequest
-	6, // 6: user.UserService.ChangePassword:input_type -> user.ChangePasswordRequest
-	2, // 7: user.UserService.UpdateUser:output_type -> user.UpdateUserResponse
-	5, // 8: user.UserService.GetTokenResetPass:output_type -> user.GetTokenResetPassResponse
-	7, // 9: user.UserService.ChangePassword:output_type -> user.ChangePasswordResponse
+	1, // 0: user-service.UpdateUserRequest.avt:type_name -> user-service.Picture
+	3, // 1: user-service.UpdateUserResponse.error:type_name -> user-service.ErrorResponse
+	3, // 2: user-service.GetTokenResetPassResponse.error:type_name -> user-service.ErrorResponse
+	3, // 3: user-service.ChangePasswordResponse.error:type_name -> user-service.ErrorResponse
+	0, // 4: user-service.UserService.UpdateUser:input_type -> user-service.UpdateUserRequest
+	4, // 5: user-service.UserService.GetTokenResetPass:input_type -> user-service.GetTokenResetPassRequest
+	6, // 6: user-service.UserService.ChangePassword:input_type -> user-service.ChangePasswordRequest
+	2, // 7: user-service.UserService.UpdateUser:output_type -> user-service.UpdateUserResponse
+	5, // 8: user-service.UserService.GetTokenResetPass:output_type -> user-service.GetTokenResetPassResponse
+	7, // 9: user-service.UserService.ChangePassword:output_type -> user-service.ChangePasswordResponse
 	7, // [7:10] is the sub-list for method output_type
 	4, // [4:7] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name
