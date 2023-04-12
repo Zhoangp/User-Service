@@ -5,7 +5,7 @@ import (
 	"github.com/Zhoangp/User-Service/pkg/common"
 )
 
-// Định nghĩa các error cho riêng phần user-service
+// Định nghĩa các error cho riêng phần User-Service
 var (
 	ErrEmailOrPasswordInvalid = common.NewCustomError(
 		errors.New("email or password invalid"),

@@ -42,9 +42,9 @@ func SendToken(cf *config.Config, destMail string, data string) error {
 	//body :=
 	//message := []byte(body)
 	//
-	//auth-service := smtp.PlainAuth("", from, password, host)
+	//auth := smtp.PlainAuth("", from, password, host)
 	//
-	//if err := smtp.SendMail(address, auth-service, from, to, message); err != nil {
+	//if err := smtp.SendMail(address, auth, from, to, message); err != nil {
 	//	return "", err
 	//}
 

@@ -13,6 +13,9 @@ service:
   PasswordTokenExpired: 1
   AccessTokenExpiredIn: 24
   RefreshTokenExpiredIn: 720
+  MaxSizeMess: 10485760
 email:
-    AppEmail: management.userxyz@gmail.com
-    AppPassword: lkkjakmjuqudztfa
+  AppEmail: management.userxyz@gmail.com
+  AppPassword: lkkjakmjuqudztfa
+otherServices:
+  FileUrl: localhost:4000

@@ -2,14 +2,18 @@ package userhttp
 
 import (
 	"context"
+	"fmt"
+	"github.com/Zhoangp/User-Service/config"
 	"github.com/Zhoangp/User-Service/internal/model"
 	"github.com/Zhoangp/User-Service/pb"
+	"github.com/Zhoangp/User-Service/pkg/client"
 	"github.com/Zhoangp/User-Service/pkg/common"
 )
 
 type userHandler struct {
 	UC UserUseCase
 	pb.UnimplementedUserServiceServer
+	Cf *config.Config
 }
 
 type UserUseCase interface {
@@ -18,8 +22,8 @@ type UserUseCase interface {
 	SendToken(email string) error
 }
 
-func NewUserHandler(userUC UserUseCase) *userHandler {
-	return &userHandler{UC: userUC}
+func NewUserHandler(userUC UserUseCase, cf *config.Config) *userHandler {
+	return &userHandler{UC: userUC, Cf: cf}
 }
 
 func (userHandler *userHandler) ChangePassword(ctx context.Context, request *pb.ChangePasswordRequest) (*pb.ChangePasswordResponse, error) {
@@ -37,6 +41,47 @@ func (userHandler *userHandler) ChangePassword(ctx context.Context, request *pb.
 
 }
 
+func (userHandler *userHandler) UpdateAvatar(ctx context.Context, req *pb.UpdateAvatarRequest) (*pb.UpdateAvatarResponse, error) {
+	cli := client.InitServiceClient(userHandler.Cf)
+
+	res, err := cli.UploadFile(ctx, &pb.UploadFileRequest{
+		FileName: req.FileName,
+		Size:     req.Size,
+		Content:  req.Content,
+		Folder:   req.Folder,
+	})
+	if err != nil {
+		fmt.Println(err)
+		return &pb.UpdateAvatarResponse{
+			Error: HandleError(err),
+		}, err
+	}
+
+	if res.Error != nil {
+		return &pb.UpdateAvatarResponse{
+			Error: HandleError(err),
+		}, nil
+	}
+	data := model.Users {
+		Email: req.Email,
+		Avatar: &common.Image{
+			Id: 1,
+			Url: res.Url,
+			Width: req.Width,
+			Height: req.Height,
+		},
+	}
+	if err := userHandler.UC.ChangeUser(&data); err != nil {
+		return &pb.UpdateAvatarResponse{
+			Error: HandleError(err),
+		}, nil
+	}
+	return &pb.UpdateAvatarResponse{
+		Url: res.Url,
+	}, nil
+
+}
+
 func (userHandler *userHandler) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UpdateUserResponse, error) {
 	data := model.Users{
 		Email:     req.Email,
@@ -46,7 +91,6 @@ func (userHandler *userHandler) UpdateUser(ctx context.Context, req *pb.UpdateUs
 		Phone:     req.PhoneNumber,
 		Address:   req.Address,
 	}
-
 	if err := userHandler.UC.ChangeUser(&data); err != nil {
 		return &pb.UpdateUserResponse{
 			Error: HandleError(err),

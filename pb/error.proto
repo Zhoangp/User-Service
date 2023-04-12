@@ -1,0 +1,7 @@
+syntax = "proto3";
+package pb;
+option go_package="github.com/Zhoangp/User-Service/pb";
+message ErrorResponse {
+  int64 code = 1;
+  string message = 2;
+}

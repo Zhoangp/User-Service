@@ -30,7 +30,7 @@ func (repo *UserRepository) NewUsers(data *model.Users) error {
 func (repo *UserRepository) FindDataWithCondition(conditions map[string]any) (*model.Users, error) {
 	var user model.Users
 	if err := repo.db.Table(model.Users{}.TableName()).Where(conditions).First(&user).Error; err != nil {
-		return nil, common.ErrEntityNotFound("user-service", err)
+		return nil, common.ErrEntityNotFound("User-Service", err)
 	}
 	return &user, nil
 }

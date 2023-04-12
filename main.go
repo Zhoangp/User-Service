@@ -32,9 +32,11 @@ func main() {
 
 	repoUser := repo.NewUserRepository(gormDb)
 	useCaseUser := usecase.NewUserUseCase(repoUser, cf)
-	hdlUser := userhttp.NewUserHandler(useCaseUser)
+	hdlUser := userhttp.NewUserHandler(useCaseUser, cf)
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer( grpc.MaxMsgSize(cf.Service.MaxSizeMess),
+		grpc.MaxRecvMsgSize(cf.Service.MaxSizeMess),
+		grpc.MaxSendMsgSize(cf.Service.MaxSizeMess),)
 	pb.RegisterUserServiceServer(grpcServer, hdlUser)
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalln("Failed to serve:", err)

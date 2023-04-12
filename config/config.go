@@ -6,6 +6,7 @@ type Config struct {
 	Service ServiceConfig
 	Mysql   mysqlConfig
 	Email   EmailConfig
+	OtherServices OtherServices
 }
 type ServiceConfig struct {
 	Version               string
@@ -15,6 +16,7 @@ type ServiceConfig struct {
 	PasswordTokenExpired  int
 	AccessTokenExpiredIn  int
 	RefreshTokenExpiredIn int
+	MaxSizeMess int
 }
 type EmailConfig struct {
 	AppEmail    string
@@ -26,6 +28,9 @@ type mysqlConfig struct {
 	User     string
 	Password string
 	DBName   string
+}
+type OtherServices struct {
+	FileUrl string
 }
 
 func LoadConfig(fileName string) (*Config, error) {
