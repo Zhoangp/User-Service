@@ -2,7 +2,6 @@ package userhttp
 
 import (
 	"context"
-	"fmt"
 	"github.com/Zhoangp/User-Service/config"
 	"github.com/Zhoangp/User-Service/internal/model"
 	"github.com/Zhoangp/User-Service/pb"
@@ -42,26 +41,30 @@ func (userHandler *userHandler) ChangePassword(ctx context.Context, request *pb.
 }
 
 func (userHandler *userHandler) UpdateAvatar(ctx context.Context, req *pb.UpdateAvatarRequest) (*pb.UpdateAvatarResponse, error) {
-	cli := client.InitServiceClient(userHandler.Cf)
-
+	cli, err := client.InitServiceClient(userHandler.Cf)
+	if err != nil {
+		return &pb.UpdateAvatarResponse{
+			Error: HandleError(err),
+		}, nil
+	}
 	res, err := cli.UploadFile(ctx, &pb.UploadFileRequest{
 		FileName: req.FileName,
 		Size:     req.Size,
 		Content:  req.Content,
 		Folder:   req.Folder,
 	})
+
 	if err != nil {
-		fmt.Println(err)
 		return &pb.UpdateAvatarResponse{
 			Error: HandleError(err),
-		}, err
+		}, nil
 	}
-
 	if res.Error != nil {
 		return &pb.UpdateAvatarResponse{
 			Error: HandleError(err),
 		}, nil
 	}
+
 	data := model.Users {
 		Email: req.Email,
 		Avatar: &common.Image{
@@ -76,6 +79,7 @@ func (userHandler *userHandler) UpdateAvatar(ctx context.Context, req *pb.Update
 			Error: HandleError(err),
 		}, nil
 	}
+
 	return &pb.UpdateAvatarResponse{
 		Url: res.Url,
 	}, nil
