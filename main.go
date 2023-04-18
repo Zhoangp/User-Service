@@ -11,12 +11,19 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"os"
 )
 
 func main() {
-	cf, err := config.LoadConfig("config/config.yml")
+	env := os.Getenv("ENV")
+	fileName := "config/config-local.yml"
+	if env == "app"{
+		fileName = "config/config-app.yml"
+	}
+
+	cf, err := config.LoadConfig(fileName)
 	if err != nil {
-		panic(err)
+		log.Fatalln("Failed at config", err)
 	}
 	gormDb, err := mysql.NewMysql(cf)
 	if err != nil {
