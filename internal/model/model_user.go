@@ -7,15 +7,15 @@ import (
 
 type Users struct {
 	common.SQLModel
-	Email        string          `json:"email" gorm:"column:email"`
-	Password     string          `json:"password" gorm:"column:password"`
-	FirstName    string          `json:"firstName" gorm:"column:firstName"`
-	LastName     string          `json:"lastName" gorm:"column:lastName"`
-	Phone        string          `json:"phone" gorm:"column:phoneNumber"`
-	Role         string          `json:"role" gorm:"column:role"`
-	Address      string          `json:"address" gorm:"column:address"`
-	IsInstructor bool `json:"is_instructor"`
-	Avatar       *common.Image   `json:"avatar" `
+	Email        string        `json:"email" gorm:"column:email"`
+	Password     string        `json:"password" gorm:"column:password"`
+	FirstName    string        `json:"firstName" gorm:"column:firstName"`
+	LastName     string        `json:"lastName" gorm:"column:lastName"`
+	Phone        string        `json:"phone" gorm:"column:phoneNumber"`
+	Role         string        `json:"role" gorm:"column:role"`
+	Address      string        `json:"address" gorm:"column:address"`
+	IsInstructor bool          `json:"is_instructor"`
+	Avatar       *common.Image `gorm:"column:picture"`
 }
 type UserRegister struct {
 	Credential   string `json:"credential"`
@@ -34,6 +34,14 @@ type UserChangePassword struct {
 	Email       string `json:"email" gorm:"column:email"`
 	OldPassword string `json:"password" gorm:"column:password"`
 	NewPass     string `json:"newpassword"`
+}
+type Instructor struct {
+	common.SQLModel
+	UserId   int    `gorm:"column:user_id"`
+	Website  string `gorm:"column:website"`
+	LinkedIn string `gorm:"column:linkedin"`
+	Youtube  string `gorm:"column:youtube"`
+	Bio      string `gorm:"column:bio"`
 }
 
 func (Users) TableName() string {

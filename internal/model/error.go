@@ -25,4 +25,8 @@ var (
 		errors.New("can not update your account"),
 		"can not update your account",
 	)
+	ErrCannotCreateInstructor = common.NewCustomError(
+		errors.New("can not create instructor"),
+		"can not create instructor",
+	)
 )

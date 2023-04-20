@@ -7,7 +7,7 @@ service UserService {
   rpc GetTokenResetPass(GetTokenResetPassRequest) returns (GetTokenResetPassResponse);
   rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
   rpc UpdateAvatar(UpdateAvatarRequest) returns (UpdateAvatarResponse);
-
+  rpc NewInstructor(NewInstructorRequest) returns (NewInstructorResponse);
 }
 
 message UpdateUserRequest {
@@ -58,5 +58,15 @@ message UpdateAvatarRequest {
 message UpdateAvatarResponse {
   string url = 1;
   pb.ErrorResponse error = 2;
+}
+message NewInstructorRequest {
+  string email = 1;
+  string website = 2;
+  string  linkedin = 3;
+  string youtube = 4;
+  string bio = 5;
+}
+message NewInstructorResponse {
+  pb.ErrorResponse error = 1;
 }
 

@@ -14,6 +14,7 @@ type UserRepository interface {
 	FindDataWithCondition(conditions map[string]any) (*model.Users, error)
 	UpdateUser(user model.Users, newInformation map[string]any) error
 	StoreToken(user *model.Users, token string) (error, *gorm.DB)
+	NewInstructor(user *model.Users, intructor *model.Instructor) error
 }
 
 type userUseCase struct {
@@ -64,6 +65,19 @@ func (uc *userUseCase) ChangeUser(data *model.Users) error {
 		"lastName":    data.LastName,
 		"phoneNumber": data.Phone,
 		"address":     data.Address,
+	}); err != nil {
+		return model.ErrCannotUpdateUser
+	}
+	return nil
+}
+
+func (uc *userUseCase) ChangeAvatar(data *model.Users) error {
+	user, err := uc.userRepo.FindDataWithCondition(map[string]any{"email": data.Email})
+	if err != nil {
+		return model.ErrEmailOrPasswordInvalid
+	}
+
+	if err := uc.userRepo.UpdateUser(user, map[string]any{"email": data.Email,
 		"picture": data.Avatar,
 	}); err != nil {
 		return model.ErrCannotUpdateUser
@@ -85,6 +99,18 @@ func (uc *userUseCase) SendToken(email string) error {
 	err = utils.SendToken(uc.cf, user.Email, token.AccessToken)
 	if err != nil {
 		return common.ErrBadRequest(err)
+	}
+	return nil
+}
+
+func (uc *userUseCase) NewInstructor(data *model.Instructor, email string) error {
+	user, err := uc.userRepo.FindDataWithCondition(map[string]any{"email": email})
+	if err != nil {
+		return model.ErrEmailOrPasswordInvalid
+	}
+	data.UserId = user.Id
+	if err := uc.userRepo.NewInstructor(user, data); err != nil {
+		return model.ErrCannotCreateInstructor
 	}
 	return nil
 }

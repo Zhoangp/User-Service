@@ -19,10 +19,25 @@ type UserUseCase interface {
 	ChangeUser(data *model.Users) error
 	ChangePassword(data *model.UserChangePassword) error
 	SendToken(email string) error
+	NewInstructor(data *model.Instructor, email string) error
+	ChangeAvatar(data *model.Users) error
 }
 
 func NewUserHandler(userUC UserUseCase, cf *config.Config) *userHandler {
 	return &userHandler{UC: userUC, Cf: cf}
+}
+func HandleError(err error) *pb.ErrorResponse {
+	if errors, ok := err.(*common.AppError); ok {
+		return &pb.ErrorResponse{
+			Code:    int64(errors.StatusCode),
+			Message: errors.Message,
+		}
+	}
+	appErr := common.ErrInternal(err.(error))
+	return &pb.ErrorResponse{
+		Code:    int64(appErr.StatusCode),
+		Message: appErr.Message,
+	}
 }
 
 func (userHandler *userHandler) ChangePassword(ctx context.Context, request *pb.ChangePasswordRequest) (*pb.ChangePasswordResponse, error) {
@@ -47,13 +62,14 @@ func (userHandler *userHandler) UpdateAvatar(ctx context.Context, req *pb.Update
 			Error: HandleError(err),
 		}, nil
 	}
+
 	res, err := cli.UploadFile(ctx, &pb.UploadFileRequest{
 		FileName: req.FileName,
 		Size:     req.Size,
 		Content:  req.Content,
 		Folder:   req.Folder,
+		OldUrl:   req.FileName,
 	})
-
 	if err != nil {
 		return &pb.UpdateAvatarResponse{
 			Error: HandleError(err),
@@ -65,16 +81,16 @@ func (userHandler *userHandler) UpdateAvatar(ctx context.Context, req *pb.Update
 		}, nil
 	}
 
-	data := model.Users {
+	data := model.Users{
 		Email: req.Email,
 		Avatar: &common.Image{
-			Id: 1,
-			Url: res.Url,
-			Width: req.Width,
+			Id:     1,
+			Url:    res.Url,
+			Width:  req.Width,
 			Height: req.Height,
 		},
 	}
-	if err := userHandler.UC.ChangeUser(&data); err != nil {
+	if err := userHandler.UC.ChangeAvatar(&data); err != nil {
 		return &pb.UpdateAvatarResponse{
 			Error: HandleError(err),
 		}, nil
@@ -113,16 +129,17 @@ func (userHandler *userHandler) GetTokenResetPass(ctx context.Context, req *pb.G
 	}
 	return &pb.GetTokenResetPassResponse{}, nil
 }
-func HandleError(err error) *pb.ErrorResponse {
-	if errors, ok := err.(*common.AppError); ok {
-		return &pb.ErrorResponse{
-			Code:    int64(errors.StatusCode),
-			Message: errors.Message,
-		}
+func (userHandler *userHandler) NewInstructor(ctx context.Context, req *pb.NewInstructorRequest) (*pb.NewInstructorResponse, error) {
+
+	if err := userHandler.UC.NewInstructor(&model.Instructor{
+		Website:  req.Website,
+		LinkedIn: req.Linkedin,
+		Youtube:  req.Youtube,
+		Bio:      req.Bio,
+	}, req.Email); err != nil {
+		return &pb.NewInstructorResponse{
+			Error: HandleError(err),
+		}, nil
 	}
-	appErr := common.ErrInternal(err.(error))
-	return &pb.ErrorResponse{
-		Code:    int64(appErr.StatusCode),
-		Message: appErr.Message,
-	}
+	return &pb.NewInstructorResponse{}, nil
 }
