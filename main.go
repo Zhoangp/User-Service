@@ -17,19 +17,20 @@ import (
 func main() {
 	env := os.Getenv("ENV")
 	fileName := "config/config-local.yml"
-	if env == "app"{
+	if env == "app" {
 		fileName = "config/config-app.yml"
 	}
-
 	cf, err := config.LoadConfig(fileName)
 	if err != nil {
 		log.Fatalln("Failed at config", err)
 	}
+
 	gormDb, err := mysql.NewMysql(cf)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+
 	lis, err := net.Listen("tcp", ":"+cf.Service.Port)
 	if err != nil {
 		fmt.Println(err)
@@ -41,9 +42,9 @@ func main() {
 	useCaseUser := usecase.NewUserUseCase(repoUser, cf)
 	hdlUser := userhttp.NewUserHandler(useCaseUser, cf)
 
-	grpcServer := grpc.NewServer( grpc.MaxMsgSize(cf.Service.MaxSizeMess),
+	grpcServer := grpc.NewServer(grpc.MaxMsgSize(cf.Service.MaxSizeMess),
 		grpc.MaxRecvMsgSize(cf.Service.MaxSizeMess),
-		grpc.MaxSendMsgSize(cf.Service.MaxSizeMess),)
+		grpc.MaxSendMsgSize(cf.Service.MaxSizeMess), )
 	pb.RegisterUserServiceServer(grpcServer, hdlUser)
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalln("Failed to serve:", err)
