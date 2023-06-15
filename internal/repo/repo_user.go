@@ -1,7 +1,6 @@
 package repo
 
 import (
-	"fmt"
 	"github.com/Zhoangp/User-Service/internal/model"
 	"github.com/Zhoangp/User-Service/pkg/common"
 	"gorm.io/gorm"
@@ -33,7 +32,6 @@ func (repo *UserRepository) FindDataWithCondition(conditions map[string]any) (*m
 	if err := repo.db.Table(model.Users{}.TableName()).Where(conditions).First(&user).Error; err != nil {
 		return nil, common.ErrEntityNotFound("User-Service", err)
 	}
-	fmt.Println(user)
 	return &user, nil
 }
 func (repo *UserRepository) UpdateUser(user *model.Users, newInformation map[string]any) error {
@@ -42,15 +40,26 @@ func (repo *UserRepository) UpdateUser(user *model.Users, newInformation map[str
 	}
 	return nil
 }
+func (repo *UserRepository) GetInstructor(condition map[string]any) (*model.Instructor, error) {
+	var instructor model.Instructor
+	if err := repo.db.Table(model.Instructor{}.TableName()).Where(condition).Preload("User").First(&instructor).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, common.NewCustomError(err, "User is not an instructor!")
+
+		}
+		return nil, err
+	}
+	return &instructor, nil
+}
 func (repo *UserRepository) NewInstructor(user *model.Users, intructor *model.Instructor) error {
 	db := repo.db.Begin()
-
+	intructor.Id = user.Id
 	if err := db.Model(&user).Update("is_instructor", 1).Error; err != nil {
 		db.Rollback()
 		return err
 	}
 
-	if err := db.Table("Instructors").Create(intructor).Error; err != nil {
+	if err := db.Table(model.Instructor{}.TableName()).Create(intructor).Error; err != nil {
 		return err
 	}
 

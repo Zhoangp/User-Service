@@ -27,6 +27,7 @@ type UserServiceClient interface {
 	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error)
 	UpdateAvatar(ctx context.Context, in *UpdateAvatarRequest, opts ...grpc.CallOption) (*UpdateAvatarResponse, error)
 	NewInstructor(ctx context.Context, in *NewInstructorRequest, opts ...grpc.CallOption) (*NewInstructorResponse, error)
+	GetInstructor(ctx context.Context, in *GetInstructorInformationRequest, opts ...grpc.CallOption) (*GetInstructorInformationResponse, error)
 }
 
 type userServiceClient struct {
@@ -82,6 +83,15 @@ func (c *userServiceClient) NewInstructor(ctx context.Context, in *NewInstructor
 	return out, nil
 }
 
+func (c *userServiceClient) GetInstructor(ctx context.Context, in *GetInstructorInformationRequest, opts ...grpc.CallOption) (*GetInstructorInformationResponse, error) {
+	out := new(GetInstructorInformationResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetInstructor", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -91,6 +101,7 @@ type UserServiceServer interface {
 	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error)
 	UpdateAvatar(context.Context, *UpdateAvatarRequest) (*UpdateAvatarResponse, error)
 	NewInstructor(context.Context, *NewInstructorRequest) (*NewInstructorResponse, error)
+	GetInstructor(context.Context, *GetInstructorInformationRequest) (*GetInstructorInformationResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -112,6 +123,9 @@ func (UnimplementedUserServiceServer) UpdateAvatar(context.Context, *UpdateAvata
 }
 func (UnimplementedUserServiceServer) NewInstructor(context.Context, *NewInstructorRequest) (*NewInstructorResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewInstructor not implemented")
+}
+func (UnimplementedUserServiceServer) GetInstructor(context.Context, *GetInstructorInformationRequest) (*GetInstructorInformationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetInstructor not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -216,6 +230,24 @@ func _UserService_NewInstructor_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetInstructor_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetInstructorInformationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetInstructor(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/GetInstructor",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetInstructor(ctx, req.(*GetInstructorInformationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -242,6 +274,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "NewInstructor",
 			Handler:    _UserService_NewInstructor_Handler,
+		},
+		{
+			MethodName: "GetInstructor",
+			Handler:    _UserService_GetInstructor_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

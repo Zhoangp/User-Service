@@ -37,13 +37,28 @@ type UserChangePassword struct {
 }
 type Instructor struct {
 	common.SQLModel
-	UserId   int    `gorm:"column:user_id"`
-	Website  string `gorm:"column:website"`
-	LinkedIn string `gorm:"column:linkedin"`
-	Youtube  string `gorm:"column:youtube"`
-	Bio      string `gorm:"column:bio"`
+	UserId       int    `gorm:"column:user_id"`
+	Website      string `gorm:"column:website" valid:"required~Website không được để trống"`
+	LinkedIn     string `gorm:"column:linkedin" valid:"required~LinkedIn không được để trống"`
+	Youtube      string `gorm:"column:youtube" valid:"required~Youtube không được để trống"`
+	Bio          string `gorm:"column:bio" valid:"required~Bio không được để trống"`
+	Paypal       Paypal ` valid:"required~Yêu cầu tài khoản paypal"`
+	NumStudents  string `gorm:"column:num_students"`
+	NumReviews   string `gorm:"column:num_reviews"`
+	TotalCourses string `gorm:"column:total_courses"`
+	User         Users  `gorm:"foreignKey:id;references:UserId"`
 }
 
+type Paypal struct {
+	common.SQLModel
+	UserId   int    `json:"userId" gorm:"column:user_id"`
+	Email    string `json:"email" gorm:"column:email"`
+	PaypalId string `json:"payerId" gorm:"column:paypal_id"`
+}
+
+func (Instructor) TableName() string {
+	return "Instructor"
+}
 func (Users) TableName() string {
 	return "Users"
 }

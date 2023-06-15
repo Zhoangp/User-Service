@@ -21,6 +21,7 @@ type UserUseCase interface {
 	SendToken(email string) error
 	NewInstructor(data *model.Instructor, email string) error
 	ChangeAvatar(data *model.Users) error
+	GetInstructor(id, key string) (*pb.GetInstructorInformationResponse, error)
 }
 
 func NewUserHandler(userUC UserUseCase, cf *config.Config) *userHandler {
@@ -52,7 +53,6 @@ func (userHandler *userHandler) ChangePassword(ctx context.Context, request *pb.
 		}, nil
 	}
 	return &pb.ChangePasswordResponse{}, nil
-
 }
 
 func (userHandler *userHandler) UpdateAvatar(ctx context.Context, req *pb.UpdateAvatarRequest) (*pb.UpdateAvatarResponse, error) {
@@ -63,12 +63,14 @@ func (userHandler *userHandler) UpdateAvatar(ctx context.Context, req *pb.Update
 		}, nil
 	}
 
-	res, err := cli.UploadFile(ctx, &pb.UploadFileRequest{
-		FileName: req.FileName,
-		Size:     req.Size,
-		Content:  req.Content,
-		Folder:   req.Folder,
-		OldUrl:   req.FileName,
+	res, err := cli.UploadAvatar(ctx, &pb.UploadAvatarRequest{
+		File: &pb.File{
+			FileName: req.FileName,
+			Size:     req.Size,
+			Content:  req.Content,
+			Folder:   req.Folder,
+		},
+		OldUrl: req.FileName,
 	})
 	if err != nil {
 		return &pb.UpdateAvatarResponse{
@@ -77,7 +79,7 @@ func (userHandler *userHandler) UpdateAvatar(ctx context.Context, req *pb.Update
 	}
 	if res.Error != nil {
 		return &pb.UpdateAvatarResponse{
-			Error: HandleError(err),
+			Error: res.Error,
 		}, nil
 	}
 
@@ -131,15 +133,40 @@ func (userHandler *userHandler) GetTokenResetPass(ctx context.Context, req *pb.G
 }
 func (userHandler *userHandler) NewInstructor(ctx context.Context, req *pb.NewInstructorRequest) (*pb.NewInstructorResponse, error) {
 
+	paymentClient, err := client.InitPaymentClient(userHandler.Cf)
+	if err != nil {
+		return &pb.NewInstructorResponse{
+			Error: HandleError(err),
+		}, nil
+	}
+	res, err := paymentClient.GetPaypal(ctx, &pb.GetPayalRequest{UserId: req.UserId})
 	if err := userHandler.UC.NewInstructor(&model.Instructor{
 		Website:  req.Website,
 		LinkedIn: req.Linkedin,
 		Youtube:  req.Youtube,
 		Bio:      req.Bio,
-	}, req.Email); err != nil {
+		Paypal: model.Paypal{
+			Email: res.Email,
+		},
+	}, req.UserId); err != nil {
 		return &pb.NewInstructorResponse{
 			Error: HandleError(err),
 		}, nil
 	}
 	return &pb.NewInstructorResponse{}, nil
+}
+func (userHandler *userHandler) GetInstructor(ctx context.Context, req *pb.GetInstructorInformationRequest) (*pb.GetInstructorInformationResponse, error) {
+	res, err := userHandler.UC.GetInstructor(req.Id, req.Key)
+	if err != nil {
+		return &pb.GetInstructorInformationResponse{
+			Error: HandleError(err),
+		}, nil
+	}
+
+	if res.Error != nil {
+		return &pb.GetInstructorInformationResponse{
+			Error: res.Error,
+		}, nil
+	}
+	return res, nil
 }

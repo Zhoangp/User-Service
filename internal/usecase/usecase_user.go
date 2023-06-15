@@ -4,8 +4,10 @@ import (
 	"github.com/Zhoangp/User-Service/config"
 	"github.com/Zhoangp/User-Service/internal/model"
 	"github.com/Zhoangp/User-Service/internal/repo"
+	"github.com/Zhoangp/User-Service/pb"
 	"github.com/Zhoangp/User-Service/pkg/common"
 	"github.com/Zhoangp/User-Service/pkg/utils"
+	"github.com/asaskevich/govalidator"
 	"gorm.io/gorm"
 )
 
@@ -15,15 +17,56 @@ type UserRepository interface {
 	UpdateUser(user model.Users, newInformation map[string]any) error
 	StoreToken(user *model.Users, token string) (error, *gorm.DB)
 	NewInstructor(user *model.Users, intructor *model.Instructor) error
+	GetInstructor(condition map[string]any) (*model.Instructor, error)
 }
 
 type userUseCase struct {
 	cf       *config.Config
+	h        *utils.Hasher
 	userRepo *repo.UserRepository
 }
 
-func NewUserUseCase(userRepo *repo.UserRepository, cf *config.Config) *userUseCase {
-	return &userUseCase{cf, userRepo}
+func NewUserUseCase(userRepo *repo.UserRepository, cf *config.Config, h *utils.Hasher) *userUseCase {
+	return &userUseCase{cf: cf, userRepo: userRepo, h: h}
+}
+func (uc *userUseCase) GetInstructor(id, key string) (*pb.GetInstructorInformationResponse, error) {
+	idDecode, err := uc.h.Decode(id)
+	if err != nil {
+		return nil, err
+	}
+	var instructor *model.Instructor
+	if key == "user" {
+		instructor, err = uc.userRepo.GetInstructor(map[string]any{"user_id": idDecode})
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		instructor, err = uc.userRepo.GetInstructor(map[string]any{"id": idDecode})
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &pb.GetInstructorInformationResponse{
+		Information: &pb.Instructor{
+			Id:           uc.h.Encode(instructor.Id),
+			FirstName:    instructor.User.FirstName,
+			LastName:     instructor.User.LastName,
+			Email:        instructor.User.Email,
+			Website:      instructor.Website,
+			Linkedin:     instructor.LinkedIn,
+			Youtube:      instructor.Youtube,
+			Bio:          instructor.Bio,
+			UserId:       uc.h.Encode(instructor.UserId),
+			NumStudents:  instructor.NumStudents,
+			NumReviews:   instructor.NumReviews,
+			TotalCourses: instructor.TotalCourses,
+			Avt: &pb.Picture{
+				Url:    instructor.User.Avatar.Url,
+				Width:  instructor.User.Avatar.Width,
+				Height: instructor.User.Avatar.Height,
+			},
+		},
+	}, nil
 }
 func (uc *userUseCase) Register(data *model.Users) error {
 	if user, _ := uc.userRepo.FindDataWithCondition(map[string]any{"email": data.Email}); user != nil {
@@ -103,12 +146,17 @@ func (uc *userUseCase) SendToken(email string) error {
 	return nil
 }
 
-func (uc *userUseCase) NewInstructor(data *model.Instructor, email string) error {
-	user, err := uc.userRepo.FindDataWithCondition(map[string]any{"email": email})
+func (uc *userUseCase) NewInstructor(data *model.Instructor, userId string) error {
+	userIdDecoded, err := uc.h.Decode(userId)
+	user, err := uc.userRepo.FindDataWithCondition(map[string]any{"id": userIdDecoded})
 	if err != nil {
 		return model.ErrEmailOrPasswordInvalid
 	}
-	data.UserId = user.Id
+
+	data.UserId = userIdDecoded
+	if _, err = govalidator.ValidateStruct(data); err != nil {
+		return common.NewCustomError(err, err.Error())
+	}
 	if err := uc.userRepo.NewInstructor(user, data); err != nil {
 		return model.ErrCannotCreateInstructor
 	}
